@@ -1,7 +1,7 @@
 #!/usr/bin/python3.8
 import os
 import discord
-#import translator
+import translator
 
 from dotenv import load_dotenv
 load_dotenv()
