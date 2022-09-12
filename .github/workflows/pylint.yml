@@ -23,4 +23,4 @@ jobs:
         pip install discord
     - name: Analysing the code with pylint
       run: |
-        pylint $('translator.py')
+        pylint translator.py
