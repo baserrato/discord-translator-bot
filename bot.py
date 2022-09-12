@@ -1,4 +1,4 @@
-#!/usr/bin/python3.8
+#!/usr/bin/python3
 """This script uses discord api to run a discord bot"""
 import os
 import discord
