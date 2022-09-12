@@ -23,4 +23,4 @@ jobs:
         pip install discord
     - name: Analysing the code with pylint
       run: |
-        pylint $(git ls-files '*.py') --threshold 2
+        pylint --fail-under=2 $(git ls-files '*.py')
