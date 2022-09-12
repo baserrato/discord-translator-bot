@@ -1,22 +1,29 @@
 #!/usr/bin/python3.8
 import os
-from dotenv import load_dotenv
-from googletrans import Translator
+import discord
+import translator
 
+from dotenv import load_dotenv
 load_dotenv()
 
-# Translation Testing
-translator = Translator()
-test = []
-# Translation via lists
-translations = translator.translate(['The quick brown fox', 'jumps over', 'the lazy dog'], dest='ko')
-for translation in translations:
-    test.append(translation.text)
-    print(translation.origin, ' -> ', translation.text)
-print(test)
-# Testing translating back to original language
-translation_rev = translator.translate(test, dest='en')
-for translation in translation_rev:
-    print(translation.text)
-# Testing single string translation
-print(translator.translate('veritas lux mea', src='la').text)
+TOKEN = os.getenv("DISCORD_TOKEN")
+
+intents = discord.Intents.default()
+intents.message_content = True
+
+client = discord.Client(intents=intents)
+
+@client.event
+async def on_ready():
+    print(str(client.user) + " has connected to Discord!")
+
+@client.event
+async def on_message(message):
+    # to not event handle messages sent by the bot
+    if message.author == client.user:
+        return
+
+    if "hello world" in message.content.lower():
+        await message.channel.send("🌎 Hello World to you to!" + message.author.mention + "🌎")
+    
+client.run(TOKEN)
