@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """This script uses discord api to run a discord bot"""
 import os
+import googletrans
 import discord
 import re
 
@@ -29,11 +30,26 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if "translate" in message.content.lower():
+    if "source" in message.content.lower():
         wordRegex = re.compile("`[\w ]+`", re.UNICODE)
         result = wordRegex.search(message.content)
-        testphrase = result.group()
-        phrase = testphrase.replace("`", "")
-        await message.channel.send(message.author.mention + " `" + phrase +"` means: `" + translator.translate(phrase).text + "`")
+        testPhrase = result.group()
+        phrase = testPhrase.replace("`", "")
+        langSource = translator.detect(phrase).lang
+        await message.channel.send(message.author.mention + " The phrase `" + phrase + "` is `" + googletrans.LANGUAGES[langSource] + "`")
 
+    if "translate" in message.content.lower():
+        regexPhrase = re.compile("`[\w ]+`", re.UNICODE)
+        regexDest = re.compile("\"[a-zA-Z_ ]+\"")
+        testPhrase = regexPhrase.search(message.content)
+        testDest = regexDest.search(message.content)
+        phrase = testPhrase.group().replace("`", "")
+        if testDest != None:
+            destination = testDest.group().replace("\"", "")
+            translateResult = translator.translate(phrase, dest=destination)
+            await message.channel.send(message.author.mention + " `" + phrase + "` translates to `"   +  googletrans.LANGUAGES[translateResult.dest] + "` as: `" + translateResult.text + "`")
+        else:
+            translateResult = translator.translate(phrase)
+            await message.channel.send(message.author.mention + " `" + phrase + "` translates to `"   +  googletrans.LANGUAGES[translateResult.dest] + "` as: `" + translateResult.text + "`")
+         
 client.run(TOKEN)
