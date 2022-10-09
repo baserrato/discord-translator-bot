@@ -1,1 +1,4 @@
 .env
+
+#ignoring kubernetes files
+k8s/
