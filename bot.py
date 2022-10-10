@@ -28,8 +28,8 @@ async def on_ready():
 async def help_command(ctx):
     help_string = "```Commands you can run with this bot: \n \n"
     help_string += "!lang -> shows a list of languages can be translated \n\n"
-    help_string += "!source `phrase to translate` -> gives language source of phrase. \n\n"
-    help_string += "!translate `phrase to translate` \"language to translate to(optional)\" \n\t\t-> translates phrase to chosen language (default is english)```"
+    help_string += "!source `[phrase to translate]` -> gives language source of phrase. \n\n"
+    help_string += "!translate `[phrase to translate]` \"[language to translate to(optional)]\" \n\t\t-> translates phrase to chosen language (default is english)```"
     await ctx.send(help_string)
 
 @client.command(name='lang')
@@ -48,11 +48,14 @@ async def languages(ctx):
 async def source(ctx):
     wordRegex = re.compile("`[\w ]+`", re.UNICODE)
     result = wordRegex.search(ctx.message.content)
-    testPhrase = result.group()
-    if testPhrase != None:
-        phrase = testPhrase.replace("`", "")
-        langSource = translator.detect(phrase).lang
-        await ctx.send(ctx.message.author.mention + " The phrase `" + phrase + "` is `" + googletrans.LANGUAGES[langSource] + "`")
+    if result != None:
+        testPhrase = result.group()
+        if testPhrase != None:
+            phrase = testPhrase.replace("`", "")
+            langSource = translator.detect(phrase).lang
+            await ctx.send(ctx.message.author.mention + " The phrase `" + phrase + "` is `" + googletrans.LANGUAGES[langSource] + "`")
+    else:
+        await ctx.send("Missing argument for `!source` requires phrase to source\nCommand Usage:```!source `[phrase]` ```")
 
 @client.command(name='translate')
 async def translate(ctx):
@@ -69,7 +72,8 @@ async def translate(ctx):
         else:
             translateResult = translator.translate(phrase)
             await ctx.send(ctx.author.mention + " `" + phrase + "` translates to `"   +  googletrans.LANGUAGES[translateResult.dest] + "` as: `" + translateResult.text + "`")
-
+    else:
+        await ctx.send("Missing argument for `!translate` requires phrase to source\nCommand Usage:```Default:\n!translate `[phrase]`\n\nOptional:\n!translate `[phrase]` \"[translate to language]\"```")
 @client.event
 async def on_message(message):
     #ignores when author of message is the bot itself
