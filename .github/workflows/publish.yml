@@ -33,11 +33,9 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
-    outputs:
-      newVersion:
-        description: "The new version tag outputted by Semantic Release"
-        value: ${{ steps.bashrelease.outputs.newVersion }}
     needs: build
+    outputs:
+      newVersion: ${{ steps.bashrelease.outputs.newVersion }}
     steps:
       - uses: actions/setup-node@v3
         with:
