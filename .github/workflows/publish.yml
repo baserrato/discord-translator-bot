@@ -8,7 +8,6 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  IMAGE_TAG: v0.0.3
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -32,8 +31,24 @@ jobs:
       run: |
         pylint --fail-under=2 $(git ls-files '*.py')
 
-  publish:
+  release:
+    outputs:
+        newVersion:
+        description: "The new version tag outputted by Semantic Release"
+        value: ${{ steps.bashrelease.outputs.newVersion }}
     needs: build
+    steps:
+        - uses: actions/setup-node@v3
+          with:
+             node-version: '16'
+        - run: npm install
+             shell: bash
+        - run: release.sh
+             id: bashrelease
+             shell: bash
+
+  publish:
+    needs: publish
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -55,5 +70,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.release.outputs.newVersion }},${{ env.IMAGE_NAME }}:latest
           labels: ${{ steps.meta.outputs.labels }}
