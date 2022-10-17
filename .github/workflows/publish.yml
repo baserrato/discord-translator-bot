@@ -40,7 +40,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '16'
-          cache: 'npm'
       - run: cd $GITHUB_ACTION_PATH && npm install
         shell: bash
       - run: $GITHUB_ACTION_PATH/release.sh
