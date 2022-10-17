@@ -47,7 +47,7 @@ jobs:
         shell: bash
 
   publish:
-    needs: publish
+    needs: release
     runs-on: ubuntu-latest
     permissions:
       contents: read
