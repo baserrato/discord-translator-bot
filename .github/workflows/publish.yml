@@ -40,8 +40,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '16'
+          cache: 'npm'
       - run: npm install
-        shell: bash
       - run: release.sh
         id: bashrelease
         shell: bash
