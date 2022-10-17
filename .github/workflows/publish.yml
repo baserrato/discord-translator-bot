@@ -32,6 +32,7 @@ jobs:
           pylint --fail-under=2 $(git ls-files '*.py')
 
   release:
+    runs-on: ubuntu-latest
     outputs:
       newVersion:
         description: "The new version tag outputted by Semantic Release"
