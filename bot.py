@@ -4,10 +4,32 @@ import os
 import googletrans
 import discord
 import re
+import time
+import subprocess
+import socket
+import requests
+import json
 
 from googletrans import Translator
 from dotenv import load_dotenv
 from discord.ext import commands
+
+def connect():
+        try:
+            r = requests.get('http://localhost:4040')
+            fields = r.json()
+            if fields["name"] == socket.gethostname():
+                return True
+            else:
+                return False
+        except:
+            return False
+
+while not connect():
+    print("Awaiting Lease...")
+    time.sleep(5)
+
+print("Lease Acquired!")
 
 load_dotenv()
 
@@ -60,7 +82,7 @@ async def source(ctx):
 @client.command(name='translate')
 async def translate(ctx):
     regexPhrase = re.compile("`[\w ]+`", re.UNICODE)
-    regexDest = re.compile("\"[a-zA-Z_ ]+\"")
+    regexDest = re.compile("\"[A-Za-z]+\"")
     testPhrase = regexPhrase.search(ctx.message.content)
     testDest = regexDest.search(ctx.message.content)
     if testPhrase != None:
@@ -71,8 +93,8 @@ async def translate(ctx):
             await ctx.send(ctx.message.author.mention + " `" + phrase + "` ("+ googletrans.LANGUAGES[translateResult.src] + ") translates to `"   +  googletrans.LANGUAGES[translateResult.dest] + "` as: `" + translateResult.text + "`")
         else:
             translateResult = translator.translate(phrase)
-            await ctx.send(ctx.author.mention + " `" + phrase + "` translates to `"   +  googletrans.LANGUAGES[translateResult.dest] + "` as: `" + translateResult.text + "`")
-    else:
+            await ctx.send(ctx.message.author.mention + " `" + phrase + "` ("+ googletrans.LANGUAGES[translateResult.src] + ") translates to `"   +  googletrans.LANGUAGES[translateResult.dest] + "` as: `" + translateResult.text + "`")
+    elif testPhrase == None:
         await ctx.send("Missing argument for `!translate` requires phrase to source\nCommand Usage:```Default:\n!translate `[phrase]`\n\nOptional:\n!translate `[phrase]` \"[translate to language]\"```")
 @client.event
 async def on_message(message):
