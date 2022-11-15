@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: discord-translate-bot
+  namespace: "translate-bot"
+  labels:
+    app: discord-translate-bot
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: discord-translate-bot
+  namespace: "translate-bot"
+  labels:
+    app: discord-translate-bot
+rules:
+  - apiGroups: [""]
+    resources: ["endpoints"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: discord-translate-bot
+  labels:
+    app: discord-translate-bot
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: discord-translate-bot
+subjects:
+  - name: discord-translate-bot
+    namespace: "translate-bot"
+    kind: ServiceAccount
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: discord-translate-deploy
+  namespace: "translate-bot"
+  labels:
+    app: discord-translate-bot
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: discord-translate-bot
+  template:
+    metadata:
+      labels:
+        app: discord-translate-bot
+      annotations:
+    spec:
+      serviceAccountName: discord-translate-bot
+      containers:
+        - name: discord-translate
+          image: "bserrato7900/discord-bot:v0.0.10"
+          ports:
+          - containerPort: 8080
+          env:
+          - name: DISCORD_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: discordsecret
+                key: DISCORD_TOKEN
+          readinessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - curl -v --silent http://localhost:4040/ 2>&1 | grep $HOSTNAME
+            initialDelaySeconds: 5
+            periodSeconds: 5
+        - name: lead-elector
+          image: "k8s.gcr.io/leader-elector:0.5"
+          args:
+          - --election=translate-bot
+          - --http=0.0.0.0:4040
+          imagePullPolicy: IfNotPresent
+          ports:
+          - containerPort: 4040
