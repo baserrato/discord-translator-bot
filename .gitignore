@@ -1,4 +1,5 @@
 .env
+.DS_Store
 
 #ignoring kubernetes files
-k8s/
+k8s/discord-secret.yaml
