@@ -10,6 +10,7 @@ import socket
 import requests
 import json
 
+from gtts import gTTS
 from googletrans import Translator
 from dotenv import load_dotenv
 from discord.ext import commands
@@ -25,9 +26,9 @@ def connect():
         except:
             return False
 
-while not connect():
-    print("Awaiting Lease...")
-    time.sleep(5)
+#while not connect():
+#    print("Awaiting Lease...")
+#    time.sleep(5)
 
 print("Lease Acquired!")
 
@@ -90,12 +91,36 @@ async def translate(ctx):
         if testDest != None:
             destination = testDest.group().replace("\"", "")
             translateResult = translator.translate(phrase, dest=destination)
+            tts = gTTS(translateResult.text, lang = translateResult.dest)
+            tts.save('dest.mp3')
             await ctx.send(ctx.message.author.mention + " `" + phrase + "` ("+ googletrans.LANGUAGES[translateResult.src] + ") translates to `"   +  googletrans.LANGUAGES[translateResult.dest] + "` as: `" + translateResult.text + "`")
+            await ctx.send(file=discord.File(r'dest.mp3'))
         else:
             translateResult = translator.translate(phrase)
             await ctx.send(ctx.message.author.mention + " `" + phrase + "` ("+ googletrans.LANGUAGES[translateResult.src] + ") translates to `"   +  googletrans.LANGUAGES[translateResult.dest] + "` as: `" + translateResult.text + "`")
     elif testPhrase == None:
         await ctx.send("Missing argument for `!translate` requires phrase to source\nCommand Usage:```Default:\n!translate `[phrase]`\n\nOptional:\n!translate `[phrase]` \"[translate to language]\"```")
+
+@client.command(name='pronounce')
+async def pronounce(ctx):
+    wordRegex = re.compile("`[\w ]+`", re.UNICODE)
+    result = wordRegex.search(ctx.message.content)
+    if result != None:
+        testPhrase = result.group()
+        if testPhrase != None:
+            phrase = testPhrase.replace("`", "")
+            langSource = translator.detect(phrase).lang
+            langPronounce = translator.translate(phrase, dest = langSource)
+            tts = gTTS(phrase, lang = langSource)
+            tts.save('pronounce.mp3')
+            if langPronounce.pronunciation != None:
+                await ctx.send(ctx.message.author.mention + " The phrase `" + phrase + "` pronunciation is `" + str(langPronounce.pronunciation) + "`")
+            else:
+                await ctx.send(ctx.message.author.mention + " The phrase `" + phrase + "` pronunciation is `" + phrase + "`")
+            await ctx.send(file=discord.File(r'pronounce.mp3'))
+    else:
+        await ctx.send("Missing argument for `!pronounce` requires phrase to pronounce\nCommand Usage:```!pronounce `[phrase]` ```")
+
 @client.event
 async def on_message(message):
     #ignores when author of message is the bot itself

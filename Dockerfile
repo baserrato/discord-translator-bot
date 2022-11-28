@@ -9,11 +9,14 @@ RUN apt update && apt upgrade -y
 RUN apt install vim -y 
 RUN apt install pip -y
 RUN apt install curl -y
+RUN apt install espeak -y
+RUN apt install ffmpeg -y
 
 RUN pip install pylint==2.15.2 && \
     pip install python-dotenv==0.21.0 && \
     pip install googletrans==4.0.0rc1 && \
     pip install discord.py==2.0.1 && \
-    pip install requests==2.28.1
+    pip install requests==2.28.1 && \
+    pip install gTTS==2.3.0
 
 ENTRYPOINT ["./bot.py"]
