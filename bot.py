@@ -65,6 +65,7 @@ async def languages(ctx):
         elif idx < len(googletrans.LANGUAGES) - 1:
             lang_string += " | "
     lang_string += "```"
+    print("\U0001F5E3")
     await ctx.send(lang_string)
 
 @client.command(name='source')
@@ -91,13 +92,22 @@ async def translate(ctx):
         if testDest != None:
             destination = testDest.group().replace("\"", "")
             translateResult = translator.translate(phrase, dest=destination)
-            tts = gTTS(translateResult.text, lang = translateResult.dest)
-            tts.save('dest.mp3')
             await ctx.send(ctx.message.author.mention + " `" + phrase + "` ("+ googletrans.LANGUAGES[translateResult.src] + ") translates to `"   +  googletrans.LANGUAGES[translateResult.dest] + "` as: `" + translateResult.text + "`")
-            await ctx.send(file=discord.File(r'dest.mp3'))
+            emojiExtract = re.compile("\U0001F5E3")
+            emojiFind = emojiExtract.search(ctx.message.content)
+            if emojiFind != None:
+                tts = gTTS(translateResult.text, lang = translateResult.dest)
+                tts.save('dest.mp3')
+                await ctx.send(file=discord.File(r'dest.mp3'))
         else:
             translateResult = translator.translate(phrase)
             await ctx.send(ctx.message.author.mention + " `" + phrase + "` ("+ googletrans.LANGUAGES[translateResult.src] + ") translates to `"   +  googletrans.LANGUAGES[translateResult.dest] + "` as: `" + translateResult.text + "`")
+            emojiExtract = re.compile("\U0001F5E3")
+            emojiFind = emojiExtract.search(ctx.message.content)
+            if emojiFind != None:
+                tts = gTTS(translateResult.text, lang = translateResult.dest)
+                tts.save('dest.mp3')
+                await ctx.send(file=discord.File(r'dest.mp3'))
     elif testPhrase == None:
         await ctx.send("Missing argument for `!translate` requires phrase to source\nCommand Usage:```Default:\n!translate `[phrase]`\n\nOptional:\n!translate `[phrase]` \"[translate to language]\"```")
 
