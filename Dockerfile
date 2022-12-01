@@ -9,8 +9,6 @@ RUN apt update && apt upgrade -y
 RUN apt install vim -y 
 RUN apt install pip -y
 RUN apt install curl -y
-RUN apt install espeak -y
-RUN apt install ffmpeg -y
 
 RUN pip install pylint==2.15.2 && \
     pip install python-dotenv==0.21.0 && \
