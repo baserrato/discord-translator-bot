@@ -56,5 +56,5 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
+          push: true
           tags: latest, ${{ github.run_number }}
-          labels: ${{ steps.meta.outputs.labels }}
