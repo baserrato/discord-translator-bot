@@ -28,6 +28,7 @@ jobs:
           pylint --fail-under=2 $(git ls-files '*.py')
 
   publish:
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -46,14 +47,13 @@ jobs:
       - name: Log in to the Container registry
         uses: docker/login-action@v2
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: docker.pkg.github.com
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
-          registry: docker.pkg.github.com
           repository: ${{ github.repository }}/translate-bot
           tags: latest, ${{ github.run_number }}
           labels: ${{ steps.meta.outputs.labels }}
