@@ -49,7 +49,7 @@ jobs:
 
       - name: Extract metadata
         id: meta
-        uses: docker/metadata@v4
+        uses: docker/metadata-action@v4
         with:
           images: ghcr.io/${{ github.repository }}
 
