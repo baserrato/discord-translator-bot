@@ -65,27 +65,31 @@ async def on_command_error(ctx, error):
             error_message += "> Did you mean to use command: ```!pronounce```"
         error_message += "\nRefer to the command `!help` to see available commands."
         await ctx.send(error_message)
+    print(error)
 
 @client.command(name="help")
 async def help_command(ctx):
-    help_string = "```Commands you can run with this bot: \n \n"
-    help_string += "!lang -> shows a list of languages can be translated \n\n"
-    help_string += "!source `[phrase to source]` -> gives language source of phrase. \n\n"
-    help_string += "!translate `[phrase to translate]` \"[language to translate to(optional)]\" \U0001F5E3(optional to include pronunciation recording)\n\t\t-> translates phrase to chosen language (default is english)\n\n"
-    help_string += "**!pronounce** `[phrase to pronounce]` ```"
-    await ctx.send(help_string)
+    embed_help = discord.Embed(
+            title = "Translator Bot Help Listing",
+            description = "Commands that can be called for the Translator Bot",
+            color = discord.Color.blurple()
+            )
+    embed_help.add_field(name="**!lang**", value="> Displays a list of languages can be translated", inline=False)
+    embed_help.add_field(name="**!source** ``` `[phrase to source]` ```", value="> Gives language source of phrase", inline=False)
+    embed_help.add_field(name="**!translate** ``` `[phrase to translate]` ```", value="Translates phrase to chosen language (default is english)\n\nOptional Parameters:\n\n >>> \"[language to translate]\" -> Language to translate to \n\n\U0001F5E3 -> Add a pronunciation recording to be included", inline=False)
+    embed_help.add_field(name="**!pronounce** ``` `[phrase to pronounce]` ```", value="> Shows the pronunciation of a phrase and gives a recording to hear the pronunciation", inline=False)
+    await ctx.send(embed=embed_help)
 
 @client.command(name='lang')
 async def languages(ctx):
-    lang_string = "```"
+    embed_lang = discord.Embed(
+            title = "Translator Bot Supported Languages",
+            description = "A listing of all supported languages Translator Bot can translate to",
+            color = discord.Color.blurple()
+            )
     for idx, languages in enumerate(googletrans.LANGUAGES):
-        lang_string += languages + " = " + googletrans.LANGUAGES[languages]
-        if idx % 3 == 0 and idx != 0:
-            lang_string += "\n"
-        elif idx < len(googletrans.LANGUAGES) - 1:
-            lang_string += " | "
-    lang_string += "```"
-    await ctx.send(lang_string)
+        embed_lang.add_field(name= languages, value=googletrans.LANGUAGES[languages]) 
+    await ctx.send(embed=embed_lang)
 
 @client.command(name='source')
 async def source(ctx):
