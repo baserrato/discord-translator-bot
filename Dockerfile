@@ -6,7 +6,6 @@ COPY bot.py .
 
 RUN apt update && apt upgrade -y
 
-RUN apt install vim -y 
 RUN apt install pip -y
 RUN apt install curl -y
 
