@@ -87,8 +87,17 @@ async def languages(ctx):
             description = "A listing of all supported languages Translator Bot can translate to",
             color = discord.Color.blurple()
             )
+    lang_support = ""
+    lang_count = 0
     for idx, languages in enumerate(googletrans.LANGUAGES):
-        embed_lang.add_field(name= languages, value=googletrans.LANGUAGES[languages]) 
+        if idx > 0 and idx % 6 == 0:
+            lang_count += 1
+            embed_lang.add_field(name="Language List #"+ str(lang_count), value=lang_support) 
+            lang_support = ""
+        lang_support += "`" + languages + "` = ***" + googletrans.LANGUAGES[languages] + "*** \n"
+    lang_count += 1
+    embed_lang.add_field(name="Language List #"+ str(lang_count), value=lang_support)
+    embed_lang.set_footer(text = "Total of " + str(len(googletrans.LANGUAGES)) + " supported languages")
     await ctx.send(embed=embed_lang)
 
 @client.command(name='source')
@@ -106,7 +115,7 @@ async def source(ctx):
 
 @client.command(name='translate')
 async def translate(ctx):
-    regexPhrase = re.compile("`[\w\s]+`", re.UNICODE)
+    regexPhrase = re.compile("`.+`", re.UNICODE)
     regexDest = re.compile("\".+\"")
     testPhrase = regexPhrase.search(ctx.message.content)
     testDest = regexDest.search(ctx.message.content)
@@ -116,35 +125,38 @@ async def translate(ctx):
             destination = testDest.group().replace("\"", "")
             try:
                 translateResult = translator.translate(phrase, dest=destination)
-                await ctx.send(ctx.message.author.mention + " `" + phrase + "` ("+ googletrans.LANGUAGES[translateResult.src] + ") translates to `"   +  googletrans.LANGUAGES[translateResult.dest] + "` as: `" + translateResult.text + "`")
+                await ctx.send(ctx.message.author.mention + " `" + phrase + "` ("+ googletrans.LANGUAGES[translateResult.src.lower()] + ") translates to `"   +  googletrans.LANGUAGES[translateResult.dest.lower()] + "` as: `" + translateResult.text + "`")
             except:
                 error_message = "Language requested `"+ destination +"` not recognized"
                 if destination == "chinese":
                     error_message += "\nDid you mean `chinese (simplified)[zh-cn]` or `chinese (traditional)[zh-tw]?`"
                 elif destination == "myanmar":
-                    error_message += "\nDid you mean `myanmar (burmese)`?"
+                    error_message += "\nDid you mean `myanmar (burmese)[my]`?"
                 elif destination == "kurdish":
-                    error_message += "\nDid you mean `kurdish (kurmanji)`?"
+                    error_message += "\nDid you mean `kurdish (kurmanji)[ku]`?"
                 error_message += "\nRefer to !lang command to see all supported languages"
                 await ctx.send(error_message)
                 return
             emojiExtract = re.compile("\U0001F5E3")
             emojiFind = emojiExtract.search(ctx.message.content)
             if emojiFind != None:
-                tts = gTTS(translateResult.text, lang = translateResult.dest)
-                tts.save('dest.mp3')
-                await ctx.send(file=discord.File(r'dest.mp3'))
+                try:
+                    tts = gTTS(translateResult.text, lang = translateResult.dest.lower())
+                    tts.save('dest.mp3')
+                    await ctx.send(file=discord.File(r'dest.mp3'))
+                except:
+                    await ctx.send("\U0001F5E3 Recording not supported for language `"+ googletrans.LANGUAGES[translateResult.dest.lower()] +"`" )
         else:
             translateResult = translator.translate(phrase)
             await ctx.send(ctx.message.author.mention + " `" + phrase + "` ["+ googletrans.LANGUAGES[translateResult.src.lower()] + "] translates to `"   +  googletrans.LANGUAGES[translateResult.dest.lower()] + "` as: `" + translateResult.text + "`")
             emojiExtract = re.compile("\U0001F5E3")
             emojiFind = emojiExtract.search(ctx.message.content)
             if emojiFind != None:
-                tts = gTTS(translateResult.text, lang = translateResult.dest)
+                tts = gTTS(translateResult.text, lang = translateResult.dest.lower())
                 tts.save('dest.mp3')
                 await ctx.send(file=discord.File(r'dest.mp3'))
     elif testPhrase == None:
-        await ctx.send("Missing argument for `!translate` requires phrase to source\nCommand Usage:```Default:\n!translate `[phrase]`\n\nOptional:\n!translate `[phrase]` \"[translate to language]\"```")
+        await ctx.send("Missing argument for `!translate` requires phrase to translate\nCommand Usage:```Default:\n!translate `[phrase]`\n\nOptional:\n!translate `[phrase]` \"[translate to language]\"```")
 
 @client.command(name='pronounce')
 async def pronounce(ctx):
@@ -155,8 +167,8 @@ async def pronounce(ctx):
         if testPhrase != None:
             phrase = testPhrase.replace("`", "")
             langSource = translator.detect(phrase).lang
-            langPronounce = translator.translate(phrase, dest = langSource)
-            tts = gTTS(phrase, lang = langSource)
+            langPronounce = translator.translate(phrase, dest = langSource.lower())
+            tts = gTTS(phrase, lang = langSource.lower())
             tts.save('pronounce.mp3')
             if langPronounce.pronunciation != None:
                 await ctx.send(ctx.message.author.mention + " The phrase `" + phrase + "` pronunciation is `" + str(langPronounce.pronunciation) + "`")
