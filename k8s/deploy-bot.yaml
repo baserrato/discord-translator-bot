@@ -19,7 +19,7 @@ spec:
       serviceAccountName: discord-translate-bot
       containers:
         - name: discord-translate
-          image: "bserrato7900/discord-bot:v0.0.10"
+          image: "ghcr.io/baserrato/discord-translator-bot:latest" 
           ports:
           - containerPort: 8080
           env:

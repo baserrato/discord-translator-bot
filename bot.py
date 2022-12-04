@@ -26,9 +26,9 @@ def connect():
         except:
             return False
 
-#while not connect():
-#    print("Awaiting Lease...")
-#    time.sleep(5)
+while not connect():
+    print("Awaiting Lease...")
+    time.sleep(5)
 
 print("Lease Acquired!")
 
