@@ -26,9 +26,9 @@ def connect():
         except:
             return False
 
-while not connect():
-    print("Awaiting Lease...")
-    time.sleep(5)
+#while not connect():
+#    print("Awaiting Lease...")
+#    time.sleep(5)
 
 print("Lease Acquired!")
 
@@ -102,7 +102,7 @@ async def languages(ctx):
 
 @client.command(name='source')
 async def source(ctx):
-    wordRegex = re.compile("`[\w\s]+`", re.UNICODE)
+    wordRegex = re.compile("`[\w\W]+`", re.UNICODE)
     result = wordRegex.search(ctx.message.content)
     if result != None:
         testPhrase = result.group()
