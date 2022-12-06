@@ -115,8 +115,8 @@ async def source(ctx):
 
 @client.command(name='translate')
 async def translate(ctx):
-    regexPhrase = re.compile("`.+`", re.UNICODE)
-    regexDest = re.compile("\".+\"")
+    regexPhrase = re.compile("`[\w\W]+`", re.UNICODE)
+    regexDest = re.compile("\"[\w\W]+\"")
     testPhrase = regexPhrase.search(ctx.message.content)
     testDest = regexDest.search(ctx.message.content)
     if testPhrase != None:
@@ -160,7 +160,7 @@ async def translate(ctx):
 
 @client.command(name='pronounce')
 async def pronounce(ctx):
-    wordRegex = re.compile("`[\w ]+`", re.UNICODE)
+    wordRegex = re.compile("`[\w\W]+`", re.UNICODE)
     result = wordRegex.search(ctx.message.content)
     if result != None:
         testPhrase = result.group()
